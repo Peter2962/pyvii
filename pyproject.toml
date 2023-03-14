@@ -18,5 +18,5 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/Peter2962/pie-validate"
-"Bug Tracker" = "https://github.com/Peter2962/pie-validate/issues"
+"Homepage" = "https://github.com/Peter2962/pyvii"
+"Bug Tracker" = "https://github.com/Peter2962/pyvii/issues"

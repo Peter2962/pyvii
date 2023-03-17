@@ -56,15 +56,21 @@ class Validator():
 						raise RuleNotFoundException(set_rule_name)
 
 					set_rule_class = self.default_rules[set_rule_name]
-					rule_object = set_rule_class(attr, set_rule)
 					
-					additional_validator_args = ''
+					additional_validator_args = []
+
 					set_rule_split = set_rule.split(':')
 					
 					if len(set_rule_split) > 1:
-						additional_validator_args = set_rule_split[1]
+						set_rule_params = set_rule_split[1].split(',')
+						if len(set_rule_params) == 1 and not set_rule_params[0]:
+							del set_rule_params[0]
 
-					if rule_object.validate(payload_attr_value, set_rule) == False:
+						additional_validator_args = set_rule_params
+
+					rule_object = set_rule_class(attr, additional_validator_args)
+
+					if rule_object.validate(payload_attr_value) == False:
 						"""
 						if validation fails for each rule, create a list for each
 						attr in self.errors dict

@@ -2,8 +2,8 @@
 from .rules.max import Max
 from .rules.min import Min
 from .rules.email import Email
-from .rules.password import Password
 from .rules.required import Required
+from .rules.confirmed import Confirmed
 
 # import exceptions
 from .exceptions.rule_not_found_exception import RuleNotFoundException
@@ -30,8 +30,8 @@ class Validator():
 			'max': Max,
 			'min': Min,
 			'email': Email,
-			'password': Password,
-			'required': Required
+			'required': Required,
+			'confirmed': Confirmed
 		}
 
 	def validate(self, schema, payload):
@@ -68,7 +68,7 @@ class Validator():
 
 						additional_validator_args = set_rule_params
 
-					rule_object = set_rule_class(attr, additional_validator_args)
+					rule_object = set_rule_class(attr=attr, args=additional_validator_args, schema=schema)
 
 					if rule_object.validate(payload_attr_value) == False:
 						"""

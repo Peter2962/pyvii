@@ -1,6 +1,13 @@
 from ..base_rule import BaseRule
 
 class Confirmed(BaseRule):
+	"""
+	Confirmed rule:
+	---------------
+	{
+		'payload_attr': 'confirmed:field_to_confirm'
+	}
+	"""
 	def __init__(self, **kwargs):
 		self.args = kwargs.get('args')
 		self.attr = kwargs.get('attr')

@@ -1,6 +1,13 @@
 from ..base_rule import BaseRule
 
 class Min(BaseRule):
+	"""
+	Min rule:
+	---------------
+	{
+		'payload_attr': 'min:10'
+	}
+	"""
 	def __init__(self, **kwargs):
 		self.length_of_field = kwargs.get('args')[0]
 		self.message = '[attr] must be greater than ' + str(self.length_of_field) + ' characters'

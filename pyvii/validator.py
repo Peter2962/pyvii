@@ -7,6 +7,7 @@ from .rules.confirmed import Confirmed
 
 # import exceptions
 from .exceptions.rule_not_found_exception import RuleNotFoundException
+from .exceptions.payload_attribute_not_found_exception import PayloadAttributeNotFoundException
 
 class Validator():
 	"""
@@ -39,48 +40,50 @@ class Validator():
 		self.payload = payload
 		self.errors = {}
 
-		for key in self.payload:
-			payload_attr_value = self.payload[key]
-			for attr in schema:
+		for attr in schema:
+			if attr not in payload.keys():
+				raise PayloadAttributeNotFoundException(attr)
+
+			payload_attr_value = self.payload[attr]
+			"""
+			set_rules is required to be a list
+			"""
+			set_rules = schema[attr]
+			for set_rule in set_rules:
+				set_rule_name = Validator.get_clean_rule_name(set_rule)
+				
 				"""
-				set_rules is required to be a list
+				make sure the rule exists in the rules list
 				"""
-				set_rules = schema[attr]
-				for set_rule in set_rules:
-					set_rule_name = Validator.get_clean_rule_name(set_rule)
-					
+				if set_rule_name not in self.default_rules.keys():
+					raise RuleNotFoundException(set_rule_name)
+
+				set_rule_class = self.default_rules[set_rule_name]
+				
+				additional_validator_args = []
+
+				set_rule_split = set_rule.split(':')
+				
+				if len(set_rule_split) > 1:
+					set_rule_params = set_rule_split[1].split(',')
+					if len(set_rule_params) == 1 and not set_rule_params[0]:
+						del set_rule_params[0]
+
+					additional_validator_args = set_rule_params
+
+				rule_object = set_rule_class(attr=attr, args=additional_validator_args, payload=payload)
+
+				if rule_object.validate(payload_attr_value) == False:
 					"""
-					make sure the rule exists in the rules list
+					if validation fails for each rule, create a list for each
+					attr in self.errors dict
 					"""
-					if set_rule_name not in self.default_rules.keys():
-						raise RuleNotFoundException(set_rule_name)
+					if attr not in self.errors.keys():
+						self.errors[attr] = []
 
-					set_rule_class = self.default_rules[set_rule_name]
-					
-					additional_validator_args = []
-
-					set_rule_split = set_rule.split(':')
-					
-					if len(set_rule_split) > 1:
-						set_rule_params = set_rule_split[1].split(',')
-						if len(set_rule_params) == 1 and not set_rule_params[0]:
-							del set_rule_params[0]
-
-						additional_validator_args = set_rule_params
-
-					rule_object = set_rule_class(attr=attr, args=additional_validator_args, schema=schema)
-
-					if rule_object.validate(payload_attr_value) == False:
-						"""
-						if validation fails for each rule, create a list for each
-						attr in self.errors dict
-						"""
-						if attr not in self.errors.keys():
-							self.errors[attr] = []
-
-						self.errors[attr].append(
-							rule_object.getMessage()
-						)
+					self.errors[attr].append(
+						rule_object.getMessage()
+					)
 
 	def get_clean_rule_name(set_rule):
 		return set_rule.split(':')[0]

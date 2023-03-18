@@ -1,1 +1,2 @@
 from .rule_not_found_exception import RuleNotFoundException
+from .schema_attribute_not_found_exception import SchemaAttributeNotFoundException

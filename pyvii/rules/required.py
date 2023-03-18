@@ -1,7 +1,8 @@
 from ..base_rule import BaseRule
 
 class Required(BaseRule):
-	def __init__(self, attr, args):
+	def __init__(self, **kwargs):
+		attr = kwargs.get('attr')
 		self.message = '[attr] is required'
 		super().__init__(self.message, {
 			'[attr]': attr
